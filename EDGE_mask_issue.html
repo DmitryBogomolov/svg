@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>EDGE mask issue</title>
+</head>
+<body>
+    <div>
+        <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="800" height="600">
+            <defs>          
+                <pattern id="mask-pattern" width="10" height="10" patternUnits="userSpaceOnUse">
+                    <rect x="0" y="0" width="10" height="10" fill="#ffffff" opacity="0.75"></rect>
+                    <path d="M 5 -5 L -5 5 M 10 0 L 0 10 M 15 5 L 5 15" stroke-width="4" stroke="#ffffff"></path>
+                </pattern>
+                <mask id="mask" x="0" y="0" width="1" height="1">
+                    <rect x="0" y="0" width="100%" height="100%" fill="url(#mask-pattern)"></rect>
+                </mask>          
+            </defs>
+        </svg>
+    </div>
+    <script>
+        'use strict';
+        
+        const root = document.querySelector('svg');
+        
+        const width = root.getAttribute('width');
+        const height = root.getAttribute('height');
+        
+        const nx = 10;
+        const ny = 10;
+        const dx = Math.round(width / nx);
+        const dy = Math.round(height / ny);
+
+        for (let y = 0; y <= height; y += dy) {
+            for (let x = 0; x <= width; x += dx) {
+                let rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                rect.setAttribute('x', x);
+                rect.setAttribute('y', y);
+                rect.setAttribute('width', dx);
+                rect.setAttribute('height', dy);
+                rect.setAttribute('fill', 'green');
+                rect.setAttribute('stroke', 'black');
+                rect.setAttribute('stroke-width', 1);
+                rect.addEventListener('mouseover', onOver);
+                rect.addEventListener('mouseout', onOut);
+                root.appendChild(rect);
+            }
+        }
+        
+        function onOver(e) {
+            e.target.setAttribute('mask', 'url(#mask)');
+        }
+        
+        function onOut(e) {
+            e.target.removeAttribute('mask');
+        }
+        
+    </script>
+</body>
+</head>
