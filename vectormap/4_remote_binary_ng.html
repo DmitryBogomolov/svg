@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="js/jquery-2.2.3.min.js"></script>
+    <script src="js/angular.min.js"></script>
+    <script src="js/angular-sanitize.min.js"></script>
+    <script src="js/dx.all.js"></script>
+    <script src="js/vectormap-utils/dx.vectormaputils.js"></script>
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+    <div ng-app="App" ng-controller="Controller" class="root">
+        <div class="widget" dx-vector-map="widgetOptions"></div>
+        <div class="info">
+            <button class="button" ng-click="toggle()">Toggle</button>
+        </div>
+    </div>
+    <script>
+        "use strict";
+        
+        const sources = ["world", "usa", "europe", "africa", "eurasia", "canada"].map(key => ({
+            name: key,
+            data: `/shapefiles/${key}`
+        }));
+        let current = 0;
+        
+        angular.module("App", ["dx"]).controller("Controller", ["$scope", function ($scope) {
+            $scope.widgetOptions = {
+                layers: [{}],
+                bindingOptions: {
+                    title: "currentName",
+                    bounds: "currentBounds",
+                    "layers[0].dataSource": "currentData"
+                }
+            };
+        
+            $scope.toggle = function () {
+                const source = sources[current];
+                DevExpress.viz.vectormaputils.parse(source.data, { precision: 2 }, (ret, error) => {
+                    $scope.$apply(() => {
+                        $scope.currentData = ret;
+                        $scope.currentName = source.name;
+                        $scope.currentBounds = ret.bbox;
+                        current = ++current % sources.length;
+                    });
+                });
+            };
+            
+            $scope.toggle();
+            
+        }]);
+        
+    </script>
+</body>
+</html>

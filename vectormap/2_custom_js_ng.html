@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="js/jquery-2.2.3.min.js"></script>
+    <script src="js/angular.min.js"></script>
+    <script src="js/angular-sanitize.min.js"></script>
+    <script src="js/dx.all.js"></script>
+    <script>window.vectormap_data = {};</script>
+    <script src="vectormap-data/world.js"></script>
+    <script src="vectormap-data/usa.js"></script>
+    <script src="vectormap-data/europe.js"></script>
+    <script src="vectormap-data/africa.js"></script>
+    <script src="vectormap-data/eurasia.js"></script>
+    <script src="vectormap-data/canada.js"></script>
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+    <div ng-app="App" ng-controller="Controller" class="root">
+        <div class="widget" dx-vector-map="widgetOptions"></div>
+        <div class="info">
+            <button class="button" ng-click="toggle()">Toggle</button>
+        </div>
+    </div>
+    <script>
+        "use strict";
+        
+        const sources = Object.keys(vectormap_data).map(key => ({
+            name: key,
+            data: vectormap_data[key]
+        }));
+        let current = 0;
+        
+        angular.module("App", ["dx"]).controller("Controller", ["$scope", function ($scope) {
+            $scope.widgetOptions = {
+                layers: [{}],
+                bindingOptions: {
+                    title: "currentName",
+                    bounds: "currentBounds",
+                    "layers[0].dataSource": "currentData"
+                }
+            };
+        
+            $scope.toggle = function () {
+                const source = sources[current];
+                $scope.currentData = source.data;
+                $scope.currentName = source.name;
+                $scope.currentBounds = source.data.bbox;
+                current = ++current % sources.length;
+            };
+            
+            $scope.toggle();
+            
+        }]);
+        
+    </script>
+</body>
+</html>
