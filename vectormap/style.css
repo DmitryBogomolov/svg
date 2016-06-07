@@ -1,0 +1,25 @@
+.root {
+    width: 1200px;
+    height: 600px;
+}
+
+.widget {
+    width: 70%;
+    height: 100%;
+    float: left;
+    margin: 4px;
+    border: 1px solid black;
+}
+
+.info {
+    width: 20%;
+    height: 100%;
+    float: left;
+    margin: 4px;
+    border: 1px solid black;
+}
+
+.button {
+    margin: 4px;
+    font-size: 20px;
+}

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="js/jquery-2.2.3.min.js"></script>
+    <script src="js/knockout-3.4.0.js"></script>
+    <script src="js/dx.all.js"></script>
+    <script src="js/vectormap-utils/dx.vectormaputils.js"></script>
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+    <div class="root">
+        <div class="widget" data-bind="dxVectorMap: {
+            title: currentName,
+            layers: [{
+                dataSource: currentData()
+            }],
+            bounds: currentBounds
+        }"></div>
+        <div class="info">
+            <button class="button" data-bind="click: toggle">Toggle</button>
+        </div>
+    </div>
+    <script>
+        "use strict";
+        
+        const sources = ["world", "usa", "europe", "africa", "eurasia", "canada"].map(key => ({
+            name: key,
+            data: `/shapefiles/${key}`
+        }));
+        let current = 0;
+
+        const currentData = ko.observable();
+        const currentName = ko.observable();
+        const currentBounds = ko.observable();
+
+        function toggle() {
+            const source = sources[current];
+            Promise.all([get(source.data + ".shp"), get(source.data + ".dbf")]).then(buffers => {
+                const data = DevExpress.viz.vectormaputils.parse({ shp: buffers[0], dbf: buffers[1] }, { precision: 3 });
+                currentData(data);
+                currentName(source.name);
+                currentBounds(data.bbox);
+                current = ++current % sources.length;
+            });
+        }
+        
+        function get(url) {
+            const request = new XMLHttpRequest();
+            request.open("GET", url);
+            request.responseType = "arraybuffer";
+            request.setRequestHeader("X-Requested-With", "XMLHttpRequest");
+            request.send(null);
+            return new Promise((resolve) => {
+                request.onreadystatechange = () => {
+                    if (request.readyState === 4 && request.status === 200) {
+                        resolve(request.response);
+                    }
+                };
+            });
+        }        
+
+        toggle();
+
+        ko.applyBindings({ currentName, currentData, currentBounds, toggle });
+        
+    </script>
+</body>
+</html>

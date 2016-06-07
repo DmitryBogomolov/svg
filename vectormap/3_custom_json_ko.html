@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="js/jquery-2.2.3.min.js"></script>
+    <script src="js/knockout-3.4.0.js"></script>
+    <script src="js/dx.all.js"></script>
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+    <div class="root">
+        <div class="widget" data-bind="dxVectorMap: {
+            title: currentName,
+            layers: [{
+                dataSource: currentData()
+            }],
+            bounds: currentBounds
+        }"></div>
+        <div class="info">
+            <button class="button" data-bind="click: toggle">Toggle</button>
+        </div>
+    </div>
+    <script>
+        "use strict";
+        
+        const sources = ["world", "usa", "europe", "africa", "eurasia", "canada"].map(key => ({
+            name: key,
+            data: `/vectormap-data/${key}.json`
+        }));
+        let current = 0;
+
+        const currentData = ko.observable();
+        const currentName = ko.observable();
+        const currentBounds = ko.observable();
+
+        function toggle() {
+            const source = sources[current];
+            currentData(source.data);
+            currentName(source.name);
+            currentBounds(source.data.bbox);
+            current = ++current % sources.length;
+        }
+
+        toggle();
+
+        ko.applyBindings({ currentName, currentData, currentBounds, toggle });
+        
+    </script>
+</body>
+</html>
