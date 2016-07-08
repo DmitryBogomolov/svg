@@ -27,30 +27,50 @@ const targets = [
 // Patch for tree_map.base
 targets[targets.length - 1].content = targets[targets.length - 1].content.replace('/tree_map_base', '/tree_map/tree_map.base');
 
+function getConfigFileName(name) {
+    return name + '.config.js';
+}
+
 Promise.all(targets.map(processTarget)).then(() => {
    console.log('DONE!');
 });
 
 function processTarget(target) {
+    return createConfig(target).then(executeBundle).then(destroyConfig);
+}
+
+function createConfig(target) {
     return new Promise((resolve) => {
-        // TODO: Use promises for the following
-        const configFile = target.name + '.config.js';
-        fs.writeFile(configFile, target.content, (e) => {
+        const filePath = getConfigFileName(target.name);
+        fs.writeFile(filePath, target.content, (e) => {
             if (e) {
-                console.log(`${configFile}: ${e}`);
+                console.log(`${filePath}: ${e}`);
             }
-            exec(`node node_modules/devextreme/bin/bundler.js ${target.name}`, (e, out, err) => {
-                console.log(out);
-                if (e) {
-                    console.log(e);
-                }
-                fs.unlink(configFile, (e) => {
-                    if (e) {
-                        console.log(`${target.file}: ${e}`);
-                    }
-                    resolve();
-                });
-            });
+            resolve(target);
+        });
+    });
+}
+
+function destroyConfig(target) {
+    return new Promise((resolve) => {
+        const filePath = getConfigFileName(target.name);
+        fs.unlink(filePath, (e) => {
+            if (e) {
+                console.log(`${filePath}: ${e}`);
+            }
+            resolve(target);
+        });
+    });
+}
+
+function executeBundle(target) {
+    return new Promise((resolve) => {
+        exec(`node node_modules/devextreme/bin/bundler.js ${target.name}`, (e, out, err) => {
+            console.log(out);
+            if (e) {
+                console.log(e);
+            }
+            resolve(target);
         });
     });
 }
