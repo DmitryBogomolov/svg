@@ -35,7 +35,7 @@ function getFileSize(filePath) {
 function compareFiles(filePath) {
     return Promise.all([getFileSize(path.join(thisPath, filePath)), getFileSize(path.join(otherPath, filePath))]).then((sizes) => {
         const [thisSize, otherSize] = sizes;
-        return { file: filePath, diff: thisSize > 0 && otherSize > 0 ? thisSize - otherSize : null };
+        return { file: filePath, thisSize, otherSize, diff: thisSize > 0 && otherSize > 0 ? thisSize - otherSize : null };
     });
 }
 
@@ -53,7 +53,7 @@ function padString(str, length) {
 
 function showDiffs(diffs) {
     diffs.forEach((diff) => {
-        console.log(`${padString(diff.file, 30)} ${formatDiff(diff.diff)}`);
+        console.log(`${padString(diff.file, 30)} ${padString(formatDiff(diff.diff), 10)} ${padString(String(diff.otherSize), 8)} -> ${padString(String(diff.thisSize), 8)}`);
     });
 }
 
