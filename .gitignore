@@ -1,3 +1,6 @@
 vectormap/js
 vectormap/shapefiles
 vectormap/vectormap-data
+
+bundler/devextreme.tgz
+bundler/node_modules
