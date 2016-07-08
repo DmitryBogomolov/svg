@@ -27,13 +27,14 @@ const targets = [
 // Patch for tree_map.base
 targets[targets.length - 1].content = targets[targets.length - 1].content.replace('/tree_map_base', '/tree_map/tree_map.base');
 
+// Patch for all
+targets.push({ name: 'dx.all', content: targets.map((target) => target.content).join('\n') });
+
 function getConfigFileName(name) {
     return name + '.config.js';
 }
 
-Promise.all(targets.map(processTarget)).then(() => {
-   console.log('DONE!');
-});
+Promise.all(targets.map(processTarget)).then(() => console.log('DONE!'));
 
 function processTarget(target) {
     return createConfig(target).then(executeBundle).then(destroyConfig);

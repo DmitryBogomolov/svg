@@ -55,6 +55,21 @@ function showDiffs(diffs) {
     diffs.forEach((diff) => {
         console.log(`${padString(diff.file, 30)} ${padString(formatDiff(diff.diff), 10)} ${padString(String(diff.otherSize), 8)} -> ${padString(String(diff.thisSize), 8)}`);
     });
+    if (process.argv[3]) {
+        return exportToFile(process.argv[3], diffs);
+    }
 }
 
-getFiles(thisPath).then(compareAllFiles).then(showDiffs);
+function exportToFile(pathToFile, diffs) {
+    return new Promise((resolve) => {
+        const content = diffs.map((diff) => `${diff.file},${diff.diff},${diff.otherSize},${diff.thisSize}`).join('\n');
+        fs.writeFile(pathToFile, content, (e) => {
+            if (e) {
+                console.log(`${pathToFile}: ${e}`);
+            }
+            resolve();
+        });
+    });
+}
+
+getFiles(thisPath).then(compareAllFiles).then(showDiffs).then(() => console.log('DONE!'));
