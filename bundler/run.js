@@ -20,7 +20,7 @@ const targets = [
     'tree_map',
     'tree_map_base'
 ].map((name) => ({
-    file: `dx.${name}.config.js`,
+    name: `dx.${name}`,
     content: `window[\'${name}\'] = require(\'devextreme/viz/${name}\');`
 }));
 
@@ -34,16 +34,17 @@ Promise.all(targets.map(processTarget)).then(() => {
 function processTarget(target) {
     return new Promise((resolve) => {
         // TODO: Use promises for the following
-        fs.writeFile(target.file, target.content, (e) => {
+        const configFile = target.name + '.config.js';
+        fs.writeFile(configFile, target.content, (e) => {
             if (e) {
-                console.log(`${target.file}: ${e}`);
+                console.log(`${configFile}: ${e}`);
             }
-            exec(`node node_modules/devextreme/bin/bundler.js ${target.file}`, (e, out, err) => {
+            exec(`node node_modules/devextreme/bin/bundler.js ${target.name}`, (e, out, err) => {
                 console.log(out);
                 if (e) {
                     console.log(e);
                 }
-                fs.unlink(target.file, (e) => {
+                fs.unlink(configFile, (e) => {
                     if (e) {
                         console.log(`${target.file}: ${e}`);
                     }
