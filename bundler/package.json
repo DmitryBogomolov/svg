@@ -13,7 +13,6 @@
     "webpack": "^4.41.2"
   },
   "dependencies": {
-    "devextreme": "file:devextreme.tgz",
     "globalize": "^1.0.0",
     "jquery": "^3.4.1"
   }
